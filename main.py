@@ -45,17 +45,19 @@ df_short_title = pd.read_sql("""
 """, conn)
 
 # STEP 8
-# Calculate sum directly in SQL to return a single scalar value
-sum_total_price = pd.read_sql("""
-    SELECT SUM(ROUND(priceEach * quantityOrdered)) AS total_price 
+# Use pd.read_sql to select priceEach * quantityOrdered, then use pandas .sum()
+df_total = pd.read_sql("""
+    SELECT priceEach * quantityOrdered AS total 
     FROM orderDetails
-""", conn)["total_price"].iloc[0]
+""", conn)
+sum_total_price = df_total["total"].round().sum()
 
 # STEP 9
+# Keep STRFTIME outputs as string formatted padded dates ('06', '08', etc.)
 df_day_month_year = pd.read_sql("""
     SELECT orderDate,
-           CAST(STRFTIME('%d', orderDate) AS INTEGER) AS day,
-           CAST(STRFTIME('%m', orderDate) AS INTEGER) AS month,
-           CAST(STRFTIME('%Y', orderDate) AS INTEGER) AS year
+           STRFTIME('%d', orderDate) AS day,
+           STRFTIME('%m', orderDate) AS month,
+           STRFTIME('%Y', orderDate) AS year
     FROM orders
 """, conn)
