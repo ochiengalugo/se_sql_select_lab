@@ -44,13 +44,11 @@ df_short_title = pd.read_sql("""
     FROM employees
 """, conn)
 
-# STEP 8
-# Use pd.read_sql to select priceEach * quantityOrdered, then use pandas .sum()
-df_total = pd.read_sql("""
-    SELECT priceEach * quantityOrdered AS total 
+# STEP 8 (Alternative)
+sum_total_price = pd.read_sql("""
+    SELECT ROUND(priceEach * quantityOrdered) AS total_price 
     FROM orderDetails
-""", conn)
-sum_total_price = df_total["total"].round().sum()
+""", conn).sum()["total_price"]
 
 # STEP 9
 # Keep STRFTIME outputs as string formatted padded dates ('06', '08', etc.)
