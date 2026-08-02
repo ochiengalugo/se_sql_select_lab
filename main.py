@@ -1,23 +1,8 @@
-# STEP 1A
-# Import SQL Library and Pandas
-import pandas as pd
 import sqlite3
+import pandas as pd
 
-# STEP 1B
-# Connect to the database
+# STEP 1
 conn = sqlite3.connect("data.sqlite")
-
-# STEP 2
-df_first_five = pd.read_sql("""
-    SELECT employeeNumber, lastName 
-    FROM employees
-""", conn)
-
-# STEP 3
-df_five_reverse = pd.read_sql("""
-    SELECT lastName, employeeNumber 
-    FROM employees
-""", conn)
 
 # STEP 2
 df_first_five = pd.read_sql("""
@@ -33,7 +18,7 @@ df_five_reverse = pd.read_sql("""
 
 # STEP 4
 df_alias = pd.read_sql("""
-    SELECT employeeNumber AS ID, lastName 
+    SELECT lastName, employeeNumber AS ID 
     FROM employees
 """, conn)
 
@@ -60,20 +45,17 @@ df_short_title = pd.read_sql("""
 """, conn)
 
 # STEP 8
-# SQLite ROUND() rounds to nearest integer by default when no second argument is passed
+# Calculate sum directly in SQL to return a single scalar value
 sum_total_price = pd.read_sql("""
-    SELECT ROUND(priceEach * quantityOrdered) AS total_price 
+    SELECT SUM(ROUND(priceEach * quantityOrdered)) AS total_price 
     FROM orderDetails
-""", conn).sum()
+""", conn)["total_price"].iloc[0]
 
 # STEP 9
-# STRFTIME extracts specific date parts from 'YYYY-MM-DD' formatted orderDate
 df_day_month_year = pd.read_sql("""
     SELECT orderDate,
-           STRFTIME('%d', orderDate) AS day,
-           STRFTIME('%m', orderDate) AS month,
-           STRFTIME('%Y', orderDate) AS year
+           CAST(STRFTIME('%d', orderDate) AS INTEGER) AS day,
+           CAST(STRFTIME('%m', orderDate) AS INTEGER) AS month,
+           CAST(STRFTIME('%Y', orderDate) AS INTEGER) AS year
     FROM orderDetails
 """, conn)
-
-
